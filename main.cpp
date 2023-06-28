@@ -30,7 +30,7 @@ vector<bool*> zombieSurvivalOptimization(int n_items, type_item * items,int numb
     }
     //Zombies hunt for humans
     //printando a posição incial dos zombies
-    for(int i=0;i<numberOfZombies;i++){
+    for(int i=0;i<zombies.size();i++){
         for(int j=0;j<n_items;j++){
             cout << zombies[i][j] << " ";
         }
@@ -45,14 +45,8 @@ vector<bool*> zombieSurvivalOptimization(int n_items, type_item * items,int numb
         }
     }
     cout << "Zombies depois de mover as posições:" << endl;
-
-    //printando a posição depois de mover os zombies
-    for(int i=0;i<numberOfZombies-1;i++){
-        for(int j=0;j<n_items;j++){
-            cout << zombies[i][j] << " ";
-        }
-        cout << endl;
-    }
+    
+    return zombies;
 }
 
 type_item *ler_items(char *filename, int *n_items, int *capacidad) {
