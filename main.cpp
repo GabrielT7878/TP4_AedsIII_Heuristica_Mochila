@@ -13,7 +13,7 @@ typedef struct {
 } type_item;
 
 
-vector<bool*> zombieSurvivalOptimization(int n_items, type_item * items,int numberOfZombies){
+vector<bool*> zombieSurvivalOptimization(int n_items, type_item * items,int numberOfZombies, int generations){
     //Incialize N zombies in search space
     vector<bool*> zombies;
     bool * temp;
@@ -28,7 +28,31 @@ vector<bool*> zombieSurvivalOptimization(int n_items, type_item * items,int numb
         }
         zombies.push_back(temp);
     }
-    return zombies;
+    //Zombies hunt for humans
+    //printando a posição incial dos zombies
+    for(int i=0;i<numberOfZombies;i++){
+        for(int j=0;j<n_items;j++){
+            cout << zombies[i][j] << " ";
+        }
+        cout << endl;
+    }
+
+    for (int i=0;i<generations;i++){
+        for(int j=0;j<numberOfZombies;j++){
+            int random = rand() % n_items;
+            zombies[j][random] = !zombies[j][random];
+            
+        }
+    }
+    cout << "Zombies depois de mover as posições:" << endl;
+
+    //printando a posição depois de mover os zombies
+    for(int i=0;i<numberOfZombies-1;i++){
+        for(int j=0;j<n_items;j++){
+            cout << zombies[i][j] << " ";
+        }
+        cout << endl;
+    }
 }
 
 type_item *ler_items(char *filename, int *n_items, int *capacidad) {
@@ -71,7 +95,7 @@ int main(int argc, char *argv[]) {
     type_item *items = ler_items(argv[1], &n_items, &capacidad);
     imprimir_items(items, n_items);
 
-    vector<bool*> teste = zombieSurvivalOptimization(n_items,items,4);
+    vector<bool*> teste = zombieSurvivalOptimization(n_items,items,10,1);
     for(int i=0;i<teste.size();i++){
         for(int j=0;j<n_items;j++){
             cout << teste[i][j] << " ";
