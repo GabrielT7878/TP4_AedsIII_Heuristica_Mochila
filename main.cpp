@@ -14,18 +14,46 @@ typedef struct {
     int beneficio;
 } type_item;
 
+int bestSolution = 0;
+int bestZombie = 0;
+vector<bool*> humans;
+
+int findClosestHuman(bool * zombie,int n_items){
+    vector<int> distances;
+    for(int i=0;i<humans.size();i++){
+        int count = 0;
+        for(int j=0;j<n_items;j++){
+            if(humans[i][j] != zombie[j]){
+                count++;
+            }
+        }
+        distances.push_back(count);
+    }
+    int min = distances[0];
+    int index = 0;
+    for(int i=0;i<distances.size();i++){
+        if(distances[i] < min){
+            min = distances[i];
+            index = i;
+        }
+    }
+    return index;
+}
 
 int evaluateFitness(bool * zombie, int n_items,type_item * items,int capacity){
     int fitness = 0;
     int peso = 0;
     for(int i=0;i<n_items;i++){
         if(zombie[i]){
-            if(peso + items[i].peso > capacity){
-                return -1;
-            }
+            // if(peso + items[i].peso > capacity){
+            //     return -1;
+            // }
             peso += items[i].peso;
             fitness += items[i].beneficio;
         }
+    }
+    if(peso > capacity){
+        fitness = fitness * 0.01;
     }
     return fitness;
 }
@@ -40,11 +68,7 @@ void gradientAscedentSearch(bool * human, int n_items,type_item * items,int capa
             human[i] = !human[i];
             neighboors.push_back(evaluateFitness(human,n_items,items,capacity));
             human[i] = !human[i];
-            cout << "Vizinho " << i << " " << "beneficio" <<  neighboors[i] << endl;
             if(neighboors[i] > lastFitness){
-                cout << "Achou um vizinho melhor" << endl;
-                cout << "Fitness do Vizinho: " << neighboors[i] << endl;
-                cout << "Fitness do Humano: " << lastFitness << endl;
                 fitness = neighboors[i];
                 index = i;
                 value = !human[i];
@@ -55,26 +79,47 @@ void gradientAscedentSearch(bool * human, int n_items,type_item * items,int capa
             human[index] = value;
         }
     }while(fitness > lastFitness);
-    cout << "Topo do Morro " << lastFitness << endl;
-}
 
-void changeZombie(bool ** zombie, int n_items,type_item * items, int * definedFitness,int capacity){
-    int random = rand() % n_items;
-    (*zombie)[random] = !(*zombie)[random];
-    int fitness = evaluateFitness((*zombie),n_items,items,capacity);
-    if(fitness >= *definedFitness){
-        *definedFitness = fitness * 1.1;
-        cout << "Virou Humano"  << endl;
-        cout << "Com Fitness de: " << fitness << endl;
-        gradientAscedentSearch((*zombie),n_items,items,capacity);
+    if(lastFitness > bestSolution){
+        bestSolution = lastFitness;
     }
 }
 
-vector<bool*> zombieSurvivalOptimization(int n_items, type_item * items,int numberOfZombies, int generations, int definedFitness,int capacity){
+void changeZombie(bool ** zombie, int n_items,type_item * items, int * definedFitness,int capacity,int velocity){
+    int random = rand() % n_items;
+    if(humans.size()){
+        //int index = findClosestHuman((*zombie),n_items);
+        for(int i=0;i<velocity;i++){
+            random = rand() % n_items;
+            (*zombie)[random] = humans[0][random];
+        } 
+    }else{
+        for(int i=0;i<velocity;i++){
+            random = rand() % n_items;
+            (*zombie)[random] = !(*zombie)[random];
+        }
+        int fitness = evaluateFitness((*zombie),n_items,items,capacity);
+        if (fitness > bestZombie){
+            bestZombie = fitness;
+        }
+        if(fitness >= *definedFitness){
+            int temp = *definedFitness;
+            *definedFitness = fitness * 1.1;
+            humans.push_back((*zombie));
+            gradientAscedentSearch((*zombie),n_items,items,capacity);
+            *definedFitness = temp;
+            humans.pop_back();
+        }
+    }
+    
+}
+
+void zombieSurvivalOptimization(int n_items, type_item * items,int numberOfZombies, int generations, int definedFitness,int capacity){
     //Incialize N zombies in search space
     vector<bool*> zombies;
     bool * temp;
     srand(time(NULL));
+    int velocity = 1,increase=0.2;
 
     for (int i=0; i < numberOfZombies;i++){
         temp = new bool[n_items];
@@ -85,29 +130,22 @@ vector<bool*> zombieSurvivalOptimization(int n_items, type_item * items,int numb
         }
         zombies.push_back(temp);
     }
-    //Zombies hunt for humans
-    //printando a posição incial dos zombies
-    for(int i=0;i<zombies.size();i++){
-        for(int j=0;j<n_items;j++){
-            cout << zombies[i][j] << " ";
-        }
-        cout << endl;
-    }
-
     vector<thread> zombieThreads; 
 
     for (int i=0;i<generations;i++){
         for(int j=0;j<numberOfZombies;j++){
-            zombieThreads.push_back(thread(changeZombie,&zombies[j],n_items,items,&definedFitness,capacity));
+            zombieThreads.push_back(thread(changeZombie,&zombies[j],n_items,items,&definedFitness,capacity,velocity));
         }
         for(int j=0;j<numberOfZombies;j++){
             zombieThreads[j].join();
         }
         zombieThreads.clear();
+        if(bestSolution == 0 && i > generations*increase){
+            velocity ++;
+            increase += 0.1;
+        }
     }
-    cout << "Zombies depois de mover as posições:" << endl;
     
-    return zombies;
 }
 
 type_item *ler_items(char *filename, int *n_items, int *capacidad) {
@@ -165,19 +203,14 @@ int main(int argc, char *argv[]) {
     }
 
     type_item *items = ler_items(argv[1], &n_items, &capacidad);
-    imprimir_items(items, n_items);
 
     int definedFitness = mochilaGulosa(items, capacidad, n_items) * 0.85;
 
-    vector<bool*> teste = zombieSurvivalOptimization(n_items,items,40,5,definedFitness,capacidad);
-    for(int i=0;i<teste.size();i++){
-        for(int j=0;j<n_items;j++){
-            cout << teste[i][j] << " ";
-        }
-        cout << endl;
-    }
+    cout << "Fitness definido: " << definedFitness << endl;
 
+    zombieSurvivalOptimization(n_items,items,200,300,definedFitness,capacidad);
 
-    free(items);
+    cout << "Melhor solução encontrada: " << bestSolution << endl;
+
     return 0;
 }
