@@ -119,7 +119,7 @@ void zombieSurvivalOptimization(int n_items, type_item * items,int numberOfZombi
     vector<bool*> zombies;
     bool * temp;
     srand(time(NULL));
-    int velocity = 1,increase=0.2;
+    int velocity = 1;
 
     for (int i=0; i < numberOfZombies;i++){
         temp = new bool[n_items];
@@ -158,7 +158,7 @@ type_item *ler_items(char *filename, int *n_items, int *capacidad) {
     }
 
     fscanf(fp, "%d %d", n_items, capacidad);
-    printf("Número de elementos: %d, Capacidade: %d\n", *n_items, *capacidad);
+    //printf("Número de elementos: %d, Capacidade: %d\n", *n_items, *capacidad);
 
     type_item *items = (type_item *)malloc(*n_items * sizeof(type_item));
 
@@ -198,7 +198,7 @@ bool * mochilaGulosa(type_item * itens, double pesoMaximo, int n_items) {
             break;
         }
     }
-    cout << "Beneficio total: " << beneficioTotal << endl;
+    //cout << "Beneficio total: " << beneficioTotal << endl;
     vector<int> indexs;
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n_items; j++) {
@@ -235,11 +235,14 @@ int main(int argc, char *argv[]) {
     bool * solution = mochilaGulosa(items, capacidad, n_items);
     definedFitness = evaluateFitness(solution,n_items,items,capacidad) * 0.7;
 
-    cout << "Fitness definido: " << definedFitness << endl;
-
+    clock_t inicio_t, fim_t;
+    double total_t_prog_dinam, total_t_forca_bruta, total_alg;
+    inicio_t = clock();
     zombieSurvivalOptimization(n_items,items,1000,10,solution,&definedFitness,capacidad);
-
+    fim_t = clock();
+    total_alg = (double)(fim_t - inicio_t) / (CLOCKS_PER_SEC/1000);
     cout << "Melhor solução encontrada: " << bestSolution << endl;
+    printf("Tempo total: %.0lf milisegundos\n", total_alg);
 
     return 0;
 }

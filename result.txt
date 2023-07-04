@@ -1,0 +1,67 @@
+f1_l-d_kp_10_269
+Melhor solução encontrada: 295
+Tempo total: 618 milisegundos
+ 
+f3_l-d_kp_4_20
+Melhor solução encontrada: 35
+Tempo total: 664 milisegundos
+
+f8_l-d_kp_23_10000
+Melhor solução encontrada: 9724
+Tempo total: 814 milisegundos
+
+knapPI_1_100_1000_1
+Melhor solução encontrada: 8900
+Tempo total: 984 milisegundos
+ 
+knapPI_1_200_1000_1
+Melhor solução encontrada: 11238
+Tempo total: 759 milisegundos
+ 
+knapPI_1_500_1000_1
+Melhor solução encontrada: 28677
+Tempo total: 670 milisegundos
+ 
+knapPI_1_1000_1000_1
+Melhor solução encontrada: 52952
+Tempo total: 634 milisegundos
+ 
+knapPI_1_2000_1000_1
+Melhor solução encontrada: 109191
+Tempo total: 692 milisegundos
+ 
+knapPI_1_5000_1000_1
+Melhor solução encontrada: 275153
+Tempo total: 1164 milisegundos
+ 
+knapPI_2_100_1000_1
+Melhor solução encontrada: 1160
+Tempo total: 687 milisegundos
+ 
+knapPI_2_200_1000_1
+Melhor solução encontrada: 1162
+Tempo total: 654 milisegundos
+ 
+knapPI_2_500_1000_1
+Melhor solução encontrada: 3606
+Tempo total: 879 milisegundos
+
+knapPI_3_100_1000_1
+Melhor solução encontrada: 2293
+Tempo total: 627 milisegundos
+ 
+knapPI_3_200_1000_1
+Melhor solução encontrada: 2592
+Tempo total: 742 milisegundos
+ 
+knapPI_3_500_1000_1
+Melhor solução encontrada: 6665
+Tempo total: 673 milisegundos
+ 
+knapPI_3_1000_1000_1
+Melhor solução encontrada: 11782
+Tempo total: 832 milisegundos
+ 
+knapPI_3_2000_1000_1
+Melhor solução encontrada: 19618
+Tempo total: 1373 milisegundos
