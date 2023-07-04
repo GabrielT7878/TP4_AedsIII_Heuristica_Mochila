@@ -129,7 +129,7 @@ void zombieSurvivalOptimization(int n_items, type_item * items,int numberOfZombi
         int random = rand() % n_items;
         for(int j=0;j<random;j++){
             random = rand() % n_items;
-            if(random > n_items * 0.99){
+            if(random > n_items * 0.5){
                 temp[random] = !temp[random];
             }
         }
@@ -189,19 +189,18 @@ bool * mochilaGulosa(type_item * itens, double pesoMaximo, int n_items) {
     sort(&copia[0], &copia[n_items-1], compararItens);
     double pesoAtual = 0.0;
     double beneficioTotal = 0.0;
-    int index = 0;
-    for (int i = 0; i < n_items; i++) {
-        if (pesoAtual + copia[i].peso <= pesoMaximo) {
-            pesoAtual += copia[i].peso;
-            beneficioTotal += copia[i].beneficio;
-            index++;
+    int n;
+    for (n=0; n < n_items; n++) {
+        if (pesoAtual + copia[n].peso <= pesoMaximo) {
+            pesoAtual += copia[n].peso;
+            beneficioTotal += copia[n].beneficio;
+        }else{
+            break;
         }
     }
-    index--;
+    cout << "Beneficio total: " << beneficioTotal << endl;
     vector<int> indexs;
-    int pesos[index];
-    int beneficios[index];
-    for (int i = 0; i < index; i++) {
+    for (int i = 0; i < n; i++) {
         for (int j = 0; j < n_items; j++) {
             if (copia[i].beneficio == itens[j].beneficio && copia[i].peso == itens[j].peso) {
                 indexs.push_back(j);
@@ -213,11 +212,11 @@ bool * mochilaGulosa(type_item * itens, double pesoMaximo, int n_items) {
     for (int i = 0; i < n_items; i++) {
         solution[i] = false;
     }
-    for (int i = 0; i < indexs.size()-1; i++) {
+    for (int i = 0; i < indexs.size(); i++) {
         solution[indexs[i]] = true;
     }
 
-    int fitness = evaluateFitness(solution,n_items,itens,pesoMaximo);
+    //int fitness = evaluateFitness(solution,n_items,itens,pesoMaximo);
 
     return solution;
 }
@@ -234,11 +233,11 @@ int main(int argc, char *argv[]) {
 
     int definedFitness;
     bool * solution = mochilaGulosa(items, capacidad, n_items);
-    definedFitness = evaluateFitness(solution,n_items,items,capacidad) * 0.5;
+    definedFitness = evaluateFitness(solution,n_items,items,capacidad) * 0.7;
 
     cout << "Fitness definido: " << definedFitness << endl;
 
-    zombieSurvivalOptimization(n_items,items,200,500,solution,&definedFitness,capacidad);
+    zombieSurvivalOptimization(n_items,items,1000,10,solution,&definedFitness,capacidad);
 
     cout << "Melhor solução encontrada: " << bestSolution << endl;
 
