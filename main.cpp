@@ -15,7 +15,6 @@ typedef struct {
 } type_item;
 
 int bestSolution = 0;
-int bestZombie = 0;
 vector<bool*> humans;
 
 int findClosestHuman(bool * zombie,int n_items){
@@ -85,20 +84,24 @@ void gradientAscedentSearch(bool * human, int n_items,type_item * items,int capa
 void changeZombie(bool ** zombie, int n_items,type_item * items, int * definedFitness,int capacity,int velocity){
     int random = rand() % n_items;
     if(humans.size()){
-        //int index = findClosestHuman((*zombie),n_items);
-        for(int i=0;i<velocity;i++){
-            random = rand() % n_items;
-            (*zombie)[random] = humans[0][random];
-        } 
+        int index = findClosestHuman((*zombie),n_items);
+        try{
+            for(int i=0;i<velocity;i++){
+                random = rand() % n_items;
+                (*zombie)[random] = humans[index][random];
+            }
+        }catch(const exception e){
+            for(int i=0;i<velocity;i++){
+                random = rand() % n_items;
+                (*zombie)[random] = humans[0][random];
+            } 
+        }
     }else{
         for(int i=0;i<velocity;i++){
             random = rand() % n_items;
             (*zombie)[random] = !(*zombie)[random];
         }
         int fitness = evaluateFitness((*zombie),n_items,items,capacity);
-        if (fitness > bestZombie){
-            bestZombie = fitness;
-        }
         if(fitness >= *definedFitness){
             int temp = *definedFitness;
             *definedFitness = fitness * 1.1;
@@ -126,20 +129,11 @@ void zombieSurvivalOptimization(int n_items, type_item * items,int numberOfZombi
         int random = rand() % n_items;
         for(int j=0;j<random;j++){
             random = rand() % n_items;
-            if(random > n_items * 0.5){
+            if(random > n_items * 0.99){
                 temp[random] = !temp[random];
             }
         }
         int peso = 0;
-        // for(int j=0; j < n_items;j++){
-        //     int random = rand() % n_items;
-        //     if(peso + items[random].peso > capacity){
-        //         break;
-        //     }else{
-        //         peso += items[random].peso;
-        //         temp[random] = true;
-        //     }
-        // }
         zombies.push_back(temp);
     }
     vector<thread> zombieThreads; 
@@ -201,11 +195,9 @@ bool * mochilaGulosa(type_item * itens, double pesoMaximo, int n_items) {
             pesoAtual += copia[i].peso;
             beneficioTotal += copia[i].beneficio;
             index++;
-            cout << "copia beneficio: "<< copia[i].beneficio << endl;
         }
     }
     index--;
-    //find the indexs of the items on the original array
     vector<int> indexs;
     int pesos[index];
     int beneficios[index];
@@ -217,7 +209,6 @@ bool * mochilaGulosa(type_item * itens, double pesoMaximo, int n_items) {
             }
         }
     }
-    //build a binary solution based on the indexs
     bool * solution = new bool[n_items];
     for (int i = 0; i < n_items; i++) {
         solution[i] = false;
@@ -243,11 +234,11 @@ int main(int argc, char *argv[]) {
 
     int definedFitness;
     bool * solution = mochilaGulosa(items, capacidad, n_items);
-    definedFitness = evaluateFitness(solution,n_items,items,capacidad) * 0.2;
+    definedFitness = evaluateFitness(solution,n_items,items,capacidad) * 0.5;
 
     cout << "Fitness definido: " << definedFitness << endl;
 
-    zombieSurvivalOptimization(n_items,items,1000,200,solution,&definedFitness,capacidad);
+    zombieSurvivalOptimization(n_items,items,200,500,solution,&definedFitness,capacidad);
 
     cout << "Melhor solução encontrada: " << bestSolution << endl;
 
